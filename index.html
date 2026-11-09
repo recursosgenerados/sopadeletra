@@ -227,7 +227,7 @@
           </h2>
           <span id="contadorPalabras" class="text-xs bg-slate-700 text-cyan-300 font-semibold px-2.5 py-1 rounded-full">0 palabras</span>
         </div>
-        </br>
+
         
         <!-- Plantillas Rápidas -->
         <div>
@@ -819,7 +819,10 @@
 
       svgContent += `
         <g id="seccion-palabras">
-          <text x="${startX}" y="${listStartY}" fill="${tema.primary}" font-size="${Math.max(12, fontSizeWords + 1)}" font-weight="700" font-family="'Montserrat', sans-serif">PALABRAS A BUSCAR (${palabras.length}):</text>
+// Título del listado
+<text x="${startX}" y="${listStartY}" fill="${tema.primary}" font-size="${Math.max(12, fontSizeWords + 1)}" font-weight="700" font-family="'Montserrat', sans-serif">
+  PALABRAS A BUSCAR (${palabras.length}):
+</text>
       `;
 
       // Calcular columnas dinámicas (3 o 4 columnas según la cantidad de palabras)
