@@ -119,6 +119,13 @@
             class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition">
         </div>
 
+        <!-- Texto del Footer -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Texto Pie de Página</label>
+          <input type="text" id="inputFooter" value="Generado con SopaDeLetras 300 DPI Pro" oninput="actualizarOpcionesYRenderizar()"
+            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition">
+        </div>
+
         <!-- Tamaño del Tablero -->
         <div class="grid grid-cols-2 gap-3">
           <div>
@@ -160,6 +167,10 @@
               <span class="text-slate-200 font-medium">Campo "Fecha: _______"</span>
               <input type="checkbox" id="checkMostrarFecha" onchange="actualizarOpcionesYRenderizar()" class="rounded text-cyan-500 focus:ring-cyan-500 bg-slate-800 border-slate-600 w-4 h-4">
             </label>
+            <label class="flex items-center justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-700 cursor-pointer hover:bg-slate-700/50">
+              <span class="text-slate-200 font-medium">Mostrar Pie de Página</span>
+              <input type="checkbox" id="checkMostrarFooter" checked onchange="actualizarOpcionesYRenderizar()" class="rounded text-cyan-500 focus:ring-cyan-500 bg-slate-800 border-slate-600 w-4 h-4">
+            </label>
           </div>
         </div>
 
@@ -174,7 +185,7 @@
               <span id="valFontGrid" class="text-cyan-400 font-mono font-bold">Auto</span>
             </div>
             <div class="flex items-center gap-2">
-              <input type="range" id="rangeFontGrid" min="0" max="36" step="1" value="0" oninput="actualizarOpcionesYRenderizar()" 
+              <input type="range" id="rangeFontGrid" min="0" max="60" step="1" value="0" oninput="actualizarOpcionesYRenderizar()" 
                 class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-cyan-500">
             </div>
             <p class="text-[10px] text-slate-400 mt-0.5">El valor 0 ajusta el tamaño automáticamente según el tamaño de la rejilla.</p>
@@ -184,9 +195,9 @@
           <div>
             <div class="flex justify-between items-center text-xs mb-1">
               <span class="text-slate-300">Lista de Palabras</span>
-              <span id="valFontWords" class="text-cyan-400 font-mono font-bold">13 px</span>
+              <span id="valFontWords" class="text-cyan-400 font-mono font-bold">20 px</span>
             </div>
-            <input type="range" id="rangeFontWords" min="10" max="24" step="1" value="13" oninput="actualizarOpcionesYRenderizar()" 
+            <input type="range" id="rangeFontWords" min="10" max="40" step="1" value="20" oninput="actualizarOpcionesYRenderizar()" 
               class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-cyan-500">
           </div>
         </div>
@@ -228,7 +239,6 @@
           <span id="contadorPalabras" class="text-xs bg-slate-700 text-cyan-300 font-semibold px-2.5 py-1 rounded-full">0 palabras</span>
         </div>
 
-        
         <!-- Plantillas Rápidas -->
         <div>
           <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Plantillas Rápidas (Carga fácil)</label>
@@ -296,7 +306,7 @@
             </svg>
             Vista Previa Imprimible (Vectorial SVG)
           </h3>
-          <span class="text-xs text-slate-400">Escala A4 / Carta Proporcional</span>
+          <span class="text-xs text-slate-400">Escala A4 / Carta (Altura Dinámica)</span>
         </div>
 
         <!-- Visualizador SVG interactivo -->
@@ -466,8 +476,10 @@
       mostrarTitulo: true,
       mostrarNombre: false,
       mostrarFecha: false,
+      mostrarFooter: true,
+      textoFooter: "Generado con SopaDeLetras 300 DPI Pro",
       fontSizeGrid: 0, // 0 = Auto
-      fontSizeWords: 13,
+      fontSizeWords: 20, // Default actualizado a 20
       palabrasOriginales: [],
       palabrasNormalizadas: [],
       grid: [],
@@ -496,6 +508,8 @@
       estadoGlobal.mostrarTitulo = document.getElementById('checkMostrarTitulo').checked;
       estadoGlobal.mostrarNombre = document.getElementById('checkMostrarNombre').checked;
       estadoGlobal.mostrarFecha = document.getElementById('checkMostrarFecha').checked;
+      estadoGlobal.mostrarFooter = document.getElementById('checkMostrarFooter').checked;
+      estadoGlobal.textoFooter = document.getElementById('inputFooter').value;
 
       estadoGlobal.fontSizeGrid = parseInt(document.getElementById('rangeFontGrid').value, 10);
       estadoGlobal.fontSizeWords = parseInt(document.getElementById('rangeFontWords').value, 10);
@@ -552,6 +566,8 @@
       estadoGlobal.mostrarTitulo = document.getElementById('checkMostrarTitulo').checked;
       estadoGlobal.mostrarNombre = document.getElementById('checkMostrarNombre').checked;
       estadoGlobal.mostrarFecha = document.getElementById('checkMostrarFecha').checked;
+      estadoGlobal.mostrarFooter = document.getElementById('checkMostrarFooter').checked;
+      estadoGlobal.textoFooter = document.getElementById('inputFooter').value;
 
       estadoGlobal.fontSizeGrid = parseInt(document.getElementById('rangeFontGrid').value, 10);
       estadoGlobal.fontSizeWords = parseInt(document.getElementById('rangeFontWords').value, 10);
@@ -705,86 +721,127 @@
       const size = estadoGlobal.tamano;
       const grid = estadoGlobal.grid;
 
-      // Dimensiones fijas para formato proporcional de impresión A4/Carta (800 x 1050 px)
-      const width = 800;
-      const height = 1050;
+      // Escala Base (3:4 ratio) -> 1200 x 1600
+      const baseWidth = 1200;
+      const baseGridSize = 960;
+      
+      const userFontSizeGrid = estadoGlobal.fontSizeGrid;
+      let actualFontSizeWords = estadoGlobal.fontSizeWords || 20;
 
-      // 1. Calcular posición Y del tablero dinámicamente según la visibilidad de los encabezados
-      let currentY = 25;
+      // Calcular cellSize y fontSize 
+      // Se asegura que una fuente muy grande empuje el tamaño del cuadro de manera proporcional
+      const autoGridFontSize = Math.max(12, Math.floor((baseGridSize / size) * 0.55));
+      const rawFontSizeGrid = (userFontSizeGrid > 0) ? userFontSizeGrid : autoGridFontSize;
+      
+      const cellSize = Math.max(baseGridSize / size, rawFontSizeGrid * 1.25);
+      const gridBoxSize = cellSize * size;
+
+      // Ajuste Dinámico de SVG manteniendo 3:4 aspect ratio
+      // Si la grilla sobrepasa los limites base, escalamos todo el entorno
+      let width = baseWidth;
+      if (gridBoxSize > baseGridSize) {
+        width = gridBoxSize + 240; // 120px padding dinámico por lado
+      }
+      
+      const scaleFactor = width / baseWidth; // Factor escalar global
+
+      // Re-escalar elementos dependientes
+      actualFontSizeWords = actualFontSizeWords * scaleFactor;
+      const actualFontSizeGrid = rawFontSizeGrid; // Su escala natural ya adaptó el layout via cellSize
+
+      // Cálculos de posiciones y Encabezados
+      let currentY = 40 * scaleFactor;
       let hasHeaderContent = false;
       let headerSvg = "";
 
       if (estadoGlobal.mostrarTitulo) {
         hasHeaderContent = true;
-        currentY += 35;
-        headerSvg += `<text x="${width / 2}" y="${currentY}" text-anchor="middle" fill="${tema.primary}" font-size="28" font-weight="800" font-family="'Montserrat', sans-serif" letter-spacing="0.5">${escapeXml(estadoGlobal.titulo)}</text>`;
+        currentY += 50 * scaleFactor;
+        headerSvg += `<text x="${width / 2}" y="${currentY}" text-anchor="middle" fill="${tema.primary}" font-size="${42 * scaleFactor}" font-weight="800" font-family="'Montserrat', sans-serif" letter-spacing="${1 * scaleFactor}">${escapeXml(estadoGlobal.titulo)}</text>`;
         if (estadoGlobal.subtitulo) {
-          currentY += 25;
-          headerSvg += `<text x="${width / 2}" y="${currentY}" text-anchor="middle" fill="${tema.secondary}" font-size="14" font-weight="500">${escapeXml(estadoGlobal.subtitulo)}</text>`;
+          currentY += 35 * scaleFactor;
+          headerSvg += `<text x="${width / 2}" y="${currentY}" text-anchor="middle" fill="${tema.secondary}" font-size="${20 * scaleFactor}" font-weight="500">${escapeXml(estadoGlobal.subtitulo)}</text>`;
         }
       }
 
       if (estadoGlobal.mostrarNombre || estadoGlobal.mostrarFecha) {
         hasHeaderContent = true;
-        currentY += 35;
-        headerSvg += `<g stroke="${tema.gridLine}" stroke-width="1">`;
+        currentY += 50 * scaleFactor;
+        const sWidth = 1.5 * scaleFactor;
+        const labelSize = 16 * scaleFactor;
+        headerSvg += `<g stroke="${tema.gridLine}" stroke-width="${sWidth}">`;
+        
+        const mLeft = 90 * scaleFactor;
+        const mRight = width - (90 * scaleFactor);
+        const split1 = width * 0.45;
+        const split2 = width * 0.55;
+
         if (estadoGlobal.mostrarNombre && estadoGlobal.mostrarFecha) {
           headerSvg += `
-            <line x1="60" y1="${currentY}" x2="350" y2="${currentY}" />
-            <text x="60" y="${currentY - 6}" fill="${tema.secondary}" font-size="11">Nombre: </text>
-            <line x1="450" y1="${currentY}" x2="740" y2="${currentY}" />
-            <text x="450" y="${currentY - 6}" fill="${tema.secondary}" font-size="11">Fecha: </text>
+            <line x1="${mLeft}" y1="${currentY}" x2="${split1}" y2="${currentY}" />
+            <text x="${mLeft}" y="${currentY - (8 * scaleFactor)}" fill="${tema.secondary}" font-size="${labelSize}">Nombre: </text>
+            <line x1="${split2}" y1="${currentY}" x2="${mRight}" y2="${currentY}" />
+            <text x="${split2}" y="${currentY - (8 * scaleFactor)}" fill="${tema.secondary}" font-size="${labelSize}">Fecha: </text>
           `;
         } else if (estadoGlobal.mostrarNombre) {
           headerSvg += `
-            <line x1="60" y1="${currentY}" x2="740" y2="${currentY}" />
-            <text x="60" y="${currentY - 6}" fill="${tema.secondary}" font-size="11">Nombre: </text>
+            <line x1="${mLeft}" y1="${currentY}" x2="${mRight}" y2="${currentY}" />
+            <text x="${mLeft}" y="${currentY - (8 * scaleFactor)}" fill="${tema.secondary}" font-size="${labelSize}">Nombre: </text>
           `;
         } else if (estadoGlobal.mostrarFecha) {
           headerSvg += `
-            <line x1="60" y1="${currentY}" x2="350" y2="${currentY}" />
-            <text x="60" y="${currentY - 6}" fill="${tema.secondary}" font-size="11">Fecha: </text>
+            <line x1="${mLeft}" y1="${currentY}" x2="${split1}" y2="${currentY}" />
+            <text x="${mLeft}" y="${currentY - (8 * scaleFactor)}" fill="${tema.secondary}" font-size="${labelSize}">Fecha: </text>
           `;
         }
         headerSvg += `</g>`;
       }
 
-      // Si se ocultaron todos los encabezados, la rejilla comienza más arriba aprovechando el espacio
-      const startY = hasHeaderContent ? currentY + 35 : 45;
+      const startY = hasHeaderContent ? currentY + (50 * scaleFactor) : 65 * scaleFactor;
+      const startX = (width - gridBoxSize) / 2;
 
-      const gridBoxSize = 560; // 560x560 px
-      const startX = (width - gridBoxSize) / 2; // Centrado horizontal
-      const cellSize = gridBoxSize / size;
+      // Calcular altura dinámica de la sección de palabras para ajustar la altura final del SVG
+      const listStartY = startY + gridBoxSize + (50 * scaleFactor);
+      const palabras = estadoGlobal.palabrasColocadas.map(p => p.orig);
+      const numCols = palabras.length > 18 ? 4 : 3;
+      const colWidth = gridBoxSize / numCols;
+      const lineHeight = actualFontSizeWords * 1.8; 
+      const listItemsStartY = listStartY + (35 * scaleFactor);
+      const rowsCount = Math.ceil(palabras.length / numCols);
+      
+      let finalY = listItemsStartY + (rowsCount * lineHeight);
 
-      // Ajuste de tamaños de fuente
-      const autoGridFontSize = Math.max(10, Math.floor(cellSize * 0.55));
-      const fontSizeGrid = (estadoGlobal.fontSizeGrid > 0) ? estadoGlobal.fontSizeGrid : autoGridFontSize;
-      const fontSizeWords = estadoGlobal.fontSizeWords || 13;
+      let footerSvg = "";
+      if (estadoGlobal.mostrarFooter && estadoGlobal.textoFooter.trim() !== "") {
+        finalY += (20 * scaleFactor);
+        footerSvg = `<text x="${width / 2}" y="${finalY}" text-anchor="middle" fill="${tema.secondary}" font-size="${14 * scaleFactor}">${escapeXml(estadoGlobal.textoFooter)}</text>`;
+        finalY += (30 * scaleFactor);
+      } else {
+        finalY += (20 * scaleFactor); // Padding extra al final si no hay footer
+      }
+
+      const height = Math.round(finalY);
 
       let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" style="background-color: ${tema.bg}; font-family: 'Inter', system-ui, -apple-system, sans-serif;">`;
 
       svgContent += `
-        <!-- Fondo Blanco General -->
+        <!-- Fondo General -->
         <rect width="${width}" height="${height}" fill="${tema.bg}" />
         ${headerSvg}
       `;
 
-      // 2. Fondo de la Rejilla y Marcas
+      // Render Fondo Rejilla
       svgContent += `<g id="rejilla-fondo">`;
-      // Borde exterior
-      svgContent += `<rect x="${startX}" y="${startY}" width="${gridBoxSize}" height="${gridBoxSize}" fill="${tema.cellBg}" stroke="${tema.primary}" stroke-width="2.5" rx="8" />`;
+      svgContent += `<rect x="${startX}" y="${startY}" width="${gridBoxSize}" height="${gridBoxSize}" fill="${tema.cellBg}" stroke="${tema.primary}" stroke-width="${3 * scaleFactor}" rx="${12 * scaleFactor}" />`;
 
-      // Cuadrícula interna
       for (let i = 1; i < size; i++) {
         const pos = i * cellSize;
-        // Líneas Verticales
-        svgContent += `<line x1="${startX + pos}" y1="${startY}" x2="${startX + pos}" y2="${startY + gridBoxSize}" stroke="${tema.gridLine}" stroke-width="1" />`;
-        // Líneas Horizontales
-        svgContent += `<line x1="${startX}" y1="${startY + pos}" x2="${startX + gridBoxSize}" y2="${startY + pos}" stroke="${tema.gridLine}" stroke-width="1" />`;
+        svgContent += `<line x1="${startX + pos}" y1="${startY}" x2="${startX + pos}" y2="${startY + gridBoxSize}" stroke="${tema.gridLine}" stroke-width="${1 * scaleFactor}" />`;
+        svgContent += `<line x1="${startX}" y1="${startY + pos}" x2="${startX + gridBoxSize}" y2="${startY + pos}" stroke="${tema.gridLine}" stroke-width="${1 * scaleFactor}" />`;
       }
       svgContent += `</g>`;
 
-      // 3. CAPAS DE SOLUCIÓN (CÁPSULAS DE RESALTADO)
+      // Soluciones
       if (mostrarSol) {
         svgContent += `<g id="capa-soluciones">`;
         estadoGlobal.palabrasColocadas.forEach(p => {
@@ -793,74 +850,58 @@
           const x2 = startX + p.end.c * cellSize + cellSize / 2;
           const y2 = startY + p.end.r * cellSize + cellSize / 2;
 
-          // Dibujar cápsula con stroke redondeado
           const capWidth = cellSize * 0.72;
           svgContent += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${tema.highlightStroke}" stroke-width="${capWidth}" stroke-linecap="round" opacity="0.35" />`;
-          svgContent += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${tema.highlightStroke}" stroke-width="2" stroke-linecap="round" opacity="0.8" fill="none" />`;
+          svgContent += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${tema.highlightStroke}" stroke-width="${2 * scaleFactor}" stroke-linecap="round" opacity="0.8" fill="none" />`;
         });
         svgContent += `</g>`;
       }
 
-      // 4. Letras del Tablero
+      // Letras de la grilla
       svgContent += `<g id="capa-letras">`;
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
           const cx = startX + c * cellSize + cellSize / 2;
-          const cy = startY + r * cellSize + cellSize / 2 + (fontSizeGrid * 0.35); // Alineación vertical fina
+          const cy = startY + r * cellSize + cellSize / 2 + (actualFontSizeGrid * 0.35);
 
-          svgContent += `<text x="${cx}" y="${cy}" text-anchor="middle" fill="${tema.gridText}" font-size="${fontSizeGrid}" font-weight="700">${grid[r][c]}</text>`;
+          svgContent += `<text x="${cx}" y="${cy}" text-anchor="middle" fill="${tema.gridText}" font-size="${actualFontSizeGrid}" font-weight="700">${grid[r][c]}</text>`;
         }
       }
       svgContent += `</g>`;
 
-      // 5. Lista de Palabras a Buscar (Abajo)
-      const listStartY = startY + gridBoxSize + 35;
-      const palabras = estadoGlobal.palabrasColocadas.map(p => p.orig);
-
+      // Lista de Palabras
       svgContent += `
         <g id="seccion-palabras">
-// Título del listado
-<text x="${startX}" y="${listStartY}" fill="${tema.primary}" font-size="${Math.max(12, fontSizeWords + 1)}" font-weight="700" font-family="'Montserrat', sans-serif">
-  PALABRAS A BUSCAR (${palabras.length}):
-</text>
+          <text x="${startX}" y="${listStartY}" fill="${tema.primary}" font-size="${Math.max(18 * scaleFactor, actualFontSizeWords + (2 * scaleFactor))}" font-weight="700" font-family="'Montserrat', sans-serif">PALABRAS A BUSCAR (${palabras.length}):</text>
       `;
 
-      // Calcular columnas dinámicas (3 o 4 columnas según la cantidad de palabras)
-      const numCols = palabras.length > 18 ? 4 : 3;
-      const colWidth = gridBoxSize / numCols;
-      const itemHeight = Math.max(22, fontSizeWords + 10);
-      const listItemsStartY = listStartY + 20;
-
-      const checkboxSize = Math.max(10, Math.min(14, fontSizeWords));
+      const checkboxSize = Math.max(14 * scaleFactor, Math.min(20 * scaleFactor, actualFontSizeWords * 0.8));
 
       palabras.forEach((pal, idx) => {
         const col = idx % numCols;
         const row = Math.floor(idx / numCols);
         const itemX = startX + col * colWidth;
-        const itemY = listItemsStartY + row * itemHeight;
+        const itemY = listItemsStartY + row * lineHeight;
 
-        // Dibujar casilla de verificación (Checkbox vacía para imprimir)
         svgContent += `
-          <rect x="${itemX}" y="${itemY - checkboxSize + 2}" width="${checkboxSize}" height="${checkboxSize}" fill="none" stroke="${tema.secondary}" stroke-width="1.5" rx="2" />
-          <text x="${itemX + checkboxSize + 8}" y="${itemY}" fill="${tema.gridText}" font-size="${fontSizeWords}" font-weight="500">${escapeXml(pal)}</text>
+          <rect x="${itemX}" y="${itemY - checkboxSize + (3 * scaleFactor)}" width="${checkboxSize}" height="${checkboxSize}" fill="none" stroke="${tema.secondary}" stroke-width="${1.5 * scaleFactor}" rx="${2 * scaleFactor}" />
+          <text x="${itemX + checkboxSize + (10 * scaleFactor)}" y="${itemY}" fill="${tema.gridText}" font-size="${actualFontSizeWords}" font-weight="500">${escapeXml(pal)}</text>
         `;
       });
-
       svgContent += `</g>`;
 
-      // 6. Pie de Página SVG
-      svgContent += `
-        <text x="${width / 2}" y="${height - 20}" text-anchor="middle" fill="${tema.secondary}" font-size="10">Generado con SopaDeLetras 300 DPI Pro</text>
-        </svg>
-      `;
+      // Footer
+      svgContent += footerSvg;
+      svgContent += `</svg>`;
 
-      return svgContent;
+      return { svgContent, width, height };
     }
 
     // Renderizar en el DOM
     function renderizarSVG() {
       const container = document.getElementById('svgContainer');
-      container.innerHTML = generarStringSVG();
+      const result = generarStringSVG();
+      container.innerHTML = result.svgContent;
     }
 
     // Función auxiliar para sanitizar texto XML/SVG
@@ -886,8 +927,8 @@
 
     // --- EXPORTACIÓN SVG ---
     function exportarSVG(esSolucion = false) {
-      const svgCode = generarStringSVG(esSolucion);
-      const blob = new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' });
+      const result = generarStringSVG(esSolucion);
+      const blob = new Blob([result.svgContent], { type: 'image/svg+xml;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement('a');
@@ -901,22 +942,21 @@
 
     // --- EXPORTACIÓN PNG A 300 DPI (ALTA RESOLUCIÓN) ---
     function exportarPNG(esSolucion = false) {
-      const svgCode = generarStringSVG(esSolucion);
+      const result = generarStringSVG(esSolucion);
+      const svgCode = result.svgContent;
       
-      // Blob e URL de la imagen SVG
+      const svgWidth = result.width;
+      const svgHeight = result.height;
+
       const blob = new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' });
       const url = URL.createObjectURL(blob);
 
       const img = new Image();
       img.onload = () => {
-        // Para lograr calidad de impresión 300 DPI en una página estándar (8.5 x 11 pulgadas):
-        // 8.5" * 300 dpi = 2550 px (Ancho)
-        // 11" * 300 dpi = 3300 px (Alto)
-        // Nuestra proporción base SVG es 800 x 1050 px (Escala ~3.75x)
-        
-        const scaleFactor = 3.75; 
-        const targetWidth = 800 * scaleFactor;   // 3000px
-        const targetHeight = 1050 * scaleFactor; // 3937px
+        // Escalar 300 DPI garantizando al menos 2700px (9 pulgadas en 300dpi)
+        const scaleFactorPNG = Math.max(2.25, 2700 / svgWidth); 
+        const targetWidth = Math.round(svgWidth * scaleFactorPNG);
+        const targetHeight = Math.round(svgHeight * scaleFactorPNG);
 
         // Crear Canvas Offscreen (En memoria)
         const canvas = document.createElement('canvas');
